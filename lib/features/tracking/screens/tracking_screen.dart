@@ -1,5 +1,7 @@
 // apps/mobile/lib/features/tracking/screens/tracking_screen.dart
-// Pantalla de grabación de actividad ciclista en tiempo real
+// Pantalla de grabación — diseño Stitch 2025: mapa full-screen + bento metrics
+
+import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
@@ -9,11 +11,9 @@ import 'package:provider/provider.dart';
 import '../../../core/services/storage_service.dart';
 import '../../../core/services/tracking_service.dart';
 import '../../../core/theme/theme_provider.dart';
+import '../../../core/widgets/gradient_button.dart';
+import 'activity_summary_screen.dart';
 
-/// Pantalla principal de tracking con mapa en tiempo real.
-///
-/// Muestra el recorrido como Polyline sobre OSM, un panel de stats inferior
-/// y botones de control de grabación según el estado actual.
 class TrackingScreen extends StatefulWidget {
   const TrackingScreen({super.key});
 
@@ -25,24 +25,23 @@ class _TrackingScreenState extends State<TrackingScreen> {
   final MapController _mapController = MapController();
   bool _siguiendoUbicacion = true;
 
-  // Colores del tema definidos en CLAUDE.md
-  static const _colorGrabando = Color(0xFF16A34A); // verde primario
-  static const _colorPausado = Color(0xFFF97316); // naranja secundario
-  static const _colorDetener = Color(0xFFEF4444); // rojo error
+  // Colores actualizados con paleta Stitch 2025
+  static const _colorGrabando = Color(0xFF006B2C);
+  static const _colorPausado = Color(0xFF9D4300);
+  static const _colorDetener = Color(0xFFBA1A1A);
 
   @override
   Widget build(BuildContext context) {
     final tracking = context.watch<TrackingService>();
     final themeProvider = context.watch<ThemeProvider>();
     final isDark = themeProvider.isDark;
-    final theme = Theme.of(context);
+    final topInset = MediaQuery.of(context).padding.top;
+    final bottomInset = MediaQuery.of(context).padding.bottom;
 
-    // Tiles según tema
     final tileUrl = isDark
         ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
         : 'https://tile.openstreetmap.org/{z}/{x}/{y}.png';
 
-    // Mover mapa automáticamente al último punto si se está grabando
     if (_siguiendoUbicacion &&
         tracking.estaGrabando &&
         tracking.puntos.isNotEmpty) {
@@ -54,134 +53,176 @@ class _TrackingScreenState extends State<TrackingScreen> {
     }
 
     return Scaffold(
-      appBar: AppBar(
-        title: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            // Indicador visual del estado actual
-            _IndicadorEstado(estado: tracking.estado),
-            const SizedBox(width: 8),
-            Text(
-              _tituloSegunEstado(tracking.estado),
-              style: const TextStyle(fontWeight: FontWeight.w700),
-            ),
-          ],
-        ),
-      ),
-      body: Column(
+      extendBodyBehindAppBar: true,
+      body: Stack(
         children: [
-          // ─── Mapa principal ────────────────────────────────────
-          Expanded(
-            child: Stack(
-              children: [
-                FlutterMap(
-                  mapController: _mapController,
-                  options: MapOptions(
-                    initialCenter: const LatLng(4.6097, -74.0817),
-                    initialZoom: 16,
-                    minZoom: 5,
-                    maxZoom: 19,
-                    onMapEvent: (_) {
-                      // Al interactuar con el mapa, dejar de seguir la ubicación
-                      if (_siguiendoUbicacion) {
-                        setState(() => _siguiendoUbicacion = false);
-                      }
-                    },
-                  ),
-                  children: [
-                    TileLayer(
-                      urlTemplate: tileUrl,
-                      subdomains: isDark
-                          ? const ['a', 'b', 'c', 'd']
-                          : const ['a', 'b', 'c'],
-                      userAgentPackageName: 'co.rutalibre.app',
+          // ── Mapa full-screen ──────────────────────────────────
+          FlutterMap(
+            mapController: _mapController,
+            options: MapOptions(
+              initialCenter: const LatLng(4.6097, -74.0817),
+              initialZoom: 16,
+              minZoom: 5,
+              maxZoom: 19,
+              onMapEvent: (_) {
+                if (_siguiendoUbicacion) {
+                  setState(() => _siguiendoUbicacion = false);
+                }
+              },
+            ),
+            children: [
+              TileLayer(
+                urlTemplate: tileUrl,
+                subdomains: isDark
+                    ? const ['a', 'b', 'c', 'd']
+                    : const ['a', 'b', 'c'],
+                userAgentPackageName: 'co.rutalibre.app',
+              ),
+              if (tracking.puntos.isNotEmpty)
+                PolylineLayer(
+                  polylines: [
+                    Polyline(
+                      points: tracking.puntos.toList(),
+                      strokeWidth: 5.0,
+                      color: tracking.estaPausado
+                          ? _colorPausado
+                          : _colorGrabando,
                     ),
-
-                    // Polyline del recorrido grabado
-                    if (tracking.puntos.isNotEmpty)
-                      PolylineLayer(
-                        polylines: [
-                          Polyline(
-                            points: tracking.puntos.toList(),
-                            strokeWidth: 5.0,
-                            color: tracking.estaPausado
-                                ? _colorPausado
-                                : _colorGrabando,
-                          ),
-                        ],
-                      ),
-
-                    // Marcador en la posición actual (último punto)
-                    if (tracking.puntos.isNotEmpty)
-                      MarkerLayer(
-                        markers: [
-                          Marker(
-                            point: tracking.puntos.last,
-                            width: 44,
-                            height: 44,
-                            child: Container(
-                              decoration: BoxDecoration(
-                                color: tracking.estaPausado
-                                    ? _colorPausado
-                                    : _colorGrabando,
-                                shape: BoxShape.circle,
-                                border:
-                                    Border.all(color: Colors.white, width: 3),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.black.withValues(alpha: 0.3),
-                                    blurRadius: 6,
-                                  ),
-                                ],
-                              ),
-                              child: const Center(
-                                child: Text('🚴',
-                                    style: TextStyle(fontSize: 20)),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
                   ],
                 ),
-
-                // Botón flotante "Mi ubicación"
-                Positioned(
-                  bottom: 16,
-                  right: 16,
-                  child: FloatingActionButton(
-                    heroTag: 'tracking_ubicacion',
-                    mini: true,
-                    onPressed: _centrarEnUbicacion,
-                    backgroundColor: theme.colorScheme.surface,
-                    foregroundColor: _siguiendoUbicacion
-                        ? theme.colorScheme.primary
-                        : theme.colorScheme.onSurface,
-                    tooltip: 'Centrar en mi ubicación',
-                    child: Icon(
-                      _siguiendoUbicacion
-                          ? Icons.my_location
-                          : Icons.location_searching,
+              if (tracking.puntos.isNotEmpty)
+                MarkerLayer(
+                  markers: [
+                    Marker(
+                      point: tracking.puntos.last,
+                      width: 44,
+                      height: 44,
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: tracking.estaPausado
+                              ? _colorPausado
+                              : _colorGrabando,
+                          shape: BoxShape.circle,
+                          border: Border.all(color: Colors.white, width: 3),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withValues(alpha: 0.3),
+                              blurRadius: 6,
+                            ),
+                          ],
+                        ),
+                        child: const Center(
+                          child: Text('🚴', style: TextStyle(fontSize: 20)),
+                        ),
+                      ),
                     ),
+                  ],
+                ),
+            ],
+          ),
+
+          // ── Gradiente oscuro (no captura eventos táctiles) ────
+          IgnorePointer(
+            child: Positioned.fill(
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    stops: const [0.0, 0.2, 0.6, 1.0],
+                    colors: [
+                      const Color(0xFF0F172A).withOpacity(0.55),
+                      Colors.transparent,
+                      Colors.transparent,
+                      const Color(0xFF0F172A).withOpacity(0.95),
+                    ],
                   ),
                 ),
-              ],
+              ),
             ),
           ),
 
-          // ─── Panel inferior de estadísticas ───────────────────
-          _PanelStats(tracking: tracking),
+          // ── Header con blur ───────────────────────────────────
+          Positioned(
+            top: 0,
+            left: 0,
+            right: 0,
+            child: ClipRect(
+              child: BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
+                child: Container(
+                  color: const Color(0xFF0F172A).withOpacity(0.75),
+                  padding: EdgeInsets.fromLTRB(24, topInset + 12, 24, 12),
+                  child: Row(
+                    children: [
+                      _IndicadorEstado(estado: tracking.estado),
+                      const SizedBox(width: 10),
+                      Text(
+                        _tituloSegunEstado(tracking.estado),
+                        style: const TextStyle(
+                          fontWeight: FontWeight.w700,
+                          fontSize: 18,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
 
-          // ─── Botones de control ────────────────────────────────
-          _PanelControles(
-            tracking: tracking,
-            onIniciar: _iniciarGrabacion,
-            onPausar: () => tracking.pausar(),
-            onReanudar: () => tracking.reanudar(),
-            onDetener: () => _confirmarDetener(context, tracking),
-            colorGrabando: _colorGrabando,
-            colorPausado: _colorPausado,
-            colorDetener: _colorDetener,
+          // ── Bento metrics ─────────────────────────────────────
+          Positioned(
+            top: topInset + 64,
+            left: 16,
+            right: 16,
+            child: _BentoMetrics(tracking: tracking),
+          ),
+
+          // ── Controles inferiores: FABs + GPS chip + CTA ───────
+          Positioned(
+            bottom: bottomInset + 88, // por encima del bottom nav
+            left: 16,
+            right: 16,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Column(
+                      children: [
+                        _MapFabButton(
+                          icon: Icons.my_location,
+                          active: _siguiendoUbicacion,
+                          onTap: _centrarEnUbicacion,
+                        ),
+                        const SizedBox(height: 10),
+                        _MapFabButton(
+                          icon: Icons.layers_outlined,
+                          active: false,
+                          onTap: () {},
+                        ),
+                      ],
+                    ),
+                    _GpsChip(grabando: tracking.estaGrabando),
+                  ],
+                ),
+                const SizedBox(height: 14),
+                _PanelControles(
+                  tracking: tracking,
+                  onIniciar: _iniciarGrabacion,
+                  onPausar: () => tracking.pausar(),
+                  onReanudar: () => tracking.reanudar(),
+                  onDetener: () => _confirmarDetener(context, tracking),
+                  colorGrabando: _colorGrabando,
+                  colorPausado: _colorPausado,
+                  colorDetener: _colorDetener,
+                ),
+              ],
+            ),
           ),
         ],
       ),
@@ -193,8 +234,6 @@ class _TrackingScreenState extends State<TrackingScreen> {
   Future<void> _iniciarGrabacion() async {
     final tracking = context.read<TrackingService>();
     await tracking.iniciarGrabacion();
-
-    // Activar seguimiento automático al iniciar
     setState(() => _siguiendoUbicacion = true);
   }
 
@@ -210,7 +249,6 @@ class _TrackingScreenState extends State<TrackingScreen> {
     BuildContext context,
     TrackingService tracking,
   ) async {
-    // Diálogo de confirmación antes de detener
     final confirmar = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
@@ -225,9 +263,7 @@ class _TrackingScreenState extends State<TrackingScreen> {
           ),
           ElevatedButton(
             onPressed: () => Navigator.pop(ctx, true),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFFEF4444),
-            ),
+            style: ElevatedButton.styleFrom(backgroundColor: _colorDetener),
             child: const Text('Detener'),
           ),
         ],
@@ -235,8 +271,6 @@ class _TrackingScreenState extends State<TrackingScreen> {
     );
 
     if (confirmar != true || !mounted) return;
-
-    // Modal para nombrar la actividad
     await _mostrarModalGuardar(context, tracking);
   }
 
@@ -244,47 +278,17 @@ class _TrackingScreenState extends State<TrackingScreen> {
     BuildContext context,
     TrackingService tracking,
   ) async {
-    final controladorNombre = TextEditingController(
-      text: _sugerirNombreActividad(),
-    );
-    final storage = context.read<StorageService>();
-
-    await showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      isDismissible: false,
-      enableDrag: false,
-      builder: (ctx) => Padding(
-        padding: EdgeInsets.only(
-          bottom: MediaQuery.of(ctx).viewInsets.bottom,
-        ),
-        child: _ModalGuardarActividad(
-          controlador: controladorNombre,
-          distanciaKm: tracking.distanciaTotalKm,
-          tiempoTranscurrido: tracking.tiempoTranscurrido,
-          onGuardar: () async {
-            Navigator.pop(ctx);
-            await tracking.detener(
-              title: controladorNombre.text,
-              citySlug: storage.ciudadSeleccionada,
-            );
-            if (mounted) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Actividad guardada correctamente'),
-                  backgroundColor: Color(0xFF16A34A),
-                ),
-              );
-            }
-          },
-        ),
+    // Navegar a la pantalla completa de resumen de actividad
+    await Navigator.of(context).push(
+      MaterialPageRoute(
+        fullscreenDialog: true,
+        builder: (_) => const ActivitySummaryScreen(),
       ),
     );
   }
 
   String _sugerirNombreActividad() {
-    final ahora = DateTime.now();
-    final hora = ahora.hour;
+    final hora = DateTime.now().hour;
     if (hora < 12) return 'Rodada matutina';
     if (hora < 17) return 'Rodada de la tarde';
     return 'Rodada nocturna';
@@ -302,28 +306,19 @@ class _TrackingScreenState extends State<TrackingScreen> {
   }
 }
 
-// ─── Widgets internos ──────────────────────────────────────────
+// ─── Indicador de estado (punto animado) ──────────────────────────
 
-/// Indicador visual del estado de grabación (punto animado).
 class _IndicadorEstado extends StatelessWidget {
   final TrackingEstado estado;
-
   const _IndicadorEstado({required this.estado});
 
   @override
   Widget build(BuildContext context) {
-    Color color;
-    switch (estado) {
-      case TrackingEstado.idle:
-        color = Colors.grey;
-        break;
-      case TrackingEstado.recording:
-        color = const Color(0xFF16A34A);
-        break;
-      case TrackingEstado.paused:
-        color = const Color(0xFFF97316);
-        break;
-    }
+    final color = switch (estado) {
+      TrackingEstado.idle => Colors.grey,
+      TrackingEstado.recording => const Color(0xFF62DF7D),
+      TrackingEstado.paused => const Color(0xFFFD761A),
+    };
 
     return Container(
       width: 10,
@@ -332,60 +327,102 @@ class _IndicadorEstado extends StatelessWidget {
         color: color,
         shape: BoxShape.circle,
         boxShadow: estado == TrackingEstado.recording
-            ? [BoxShadow(color: color.withValues(alpha: 0.5), blurRadius: 6, spreadRadius: 2)]
+            ? [BoxShadow(color: color.withValues(alpha: 0.6), blurRadius: 8, spreadRadius: 2)]
             : null,
       ),
     );
   }
 }
 
-/// Panel con estadísticas en tiempo real: tiempo, distancia, velocidades.
-class _PanelStats extends StatelessWidget {
-  final TrackingService tracking;
+// ─── Bento metrics grid ────────────────────────────────────────────
 
-  const _PanelStats({required this.tracking});
+class _BentoMetrics extends StatelessWidget {
+  final TrackingService tracking;
+  const _BentoMetrics({required this.tracking});
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      decoration: BoxDecoration(
-        color: theme.colorScheme.surface,
-        border: Border(
-          top: BorderSide(color: theme.colorScheme.outline),
+    return Column(
+      children: [
+        // Tiempo — tarjeta grande
+        _GlassCard(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                'TIEMPO DE GRABACIÓN',
+                style: TextStyle(
+                  fontSize: 9,
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: 2.0,
+                  color: Color(0xFF62DF7D),
+                ),
+              ),
+              const SizedBox(height: 6),
+              Text(
+                _formatearTiempo(tracking.tiempoTranscurrido),
+                style: const TextStyle(
+                  fontSize: 58,
+                  fontWeight: FontWeight.w900,
+                  letterSpacing: -2,
+                  color: Colors.white,
+                  height: 1.0,
+                ),
+              ),
+            ],
+          ),
         ),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: [
-          _StatItem(
-            icon: Icons.timer_outlined,
-            valor: _formatearTiempo(tracking.tiempoTranscurrido),
-            etiqueta: 'Tiempo',
-          ),
-          _Divisor(),
-          _StatItem(
-            icon: Icons.straighten,
-            valor: '${tracking.distanciaTotalKm.toStringAsFixed(2)} km',
-            etiqueta: 'Distancia',
-          ),
-          _Divisor(),
-          _StatItem(
-            icon: Icons.speed,
-            valor: '${tracking.velocidadActualKmh.toStringAsFixed(1)} km/h',
-            etiqueta: 'Velocidad',
-          ),
-          _Divisor(),
-          _StatItem(
-            icon: Icons.trending_up,
-            valor: '${tracking.velocidadPromedioKmh.toStringAsFixed(1)} km/h',
-            etiqueta: 'Promedio',
-          ),
-        ],
-      ),
+        const SizedBox(height: 10),
+        // Fila 1: Distancia + Desnivel
+        Row(
+          children: [
+            Expanded(
+              child: _GlassCard(
+                child: _MetricCell(
+                  label: 'DISTANCIA',
+                  value: tracking.distanciaTotalKm.toStringAsFixed(1),
+                  unit: 'KM',
+                ),
+              ),
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: _GlassCard(
+                child: _MetricCell(
+                  label: 'DESNIVEL',
+                  value: '--',
+                  unit: 'M',
+                ),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 10),
+        // Fila 2: Velocidad prom. + Calorías
+        Row(
+          children: [
+            Expanded(
+              child: _GlassCard(
+                child: _MetricCell(
+                  label: 'VEL. PROM.',
+                  value: tracking.velocidadPromedioKmh.toStringAsFixed(1),
+                  unit: 'KM/H',
+                ),
+              ),
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: _GlassCard(
+                child: _MetricCell(
+                  label: 'QUEMADAS',
+                  value: '--',
+                  unit: 'KCAL',
+                ),
+              ),
+            ),
+          ],
+        ),
+      ],
     );
   }
 
@@ -397,56 +434,196 @@ class _PanelStats extends StatelessWidget {
   }
 }
 
-class _StatItem extends StatelessWidget {
-  final IconData icon;
-  final String valor;
-  final String etiqueta;
+// ─── Tarjeta con efecto vidrio ─────────────────────────────────────
 
-  const _StatItem({
-    required this.icon,
-    required this.valor,
-    required this.etiqueta,
-  });
+class _GlassCard extends StatelessWidget {
+  final Widget child;
+  const _GlassCard({required this.child});
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(12),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+        child: Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: const Color(0xFF020617).withOpacity(0.65),
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: Colors.white.withOpacity(0.06)),
+          ),
+          child: child,
+        ),
+      ),
+    );
+  }
+}
+
+// ─── Celda de métrica ──────────────────────────────────────────────
+
+class _MetricCell extends StatelessWidget {
+  final String label;
+  final String value;
+  final String unit;
+  const _MetricCell({required this.label, required this.value, required this.unit});
+
+  @override
+  Widget build(BuildContext context) {
     return Column(
-      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Icon(icon, size: 18, color: theme.colorScheme.primary),
-        const SizedBox(height: 4),
         Text(
-          valor,
-          style: theme.textTheme.bodyMedium?.copyWith(
+          label,
+          style: const TextStyle(
+            fontSize: 9,
             fontWeight: FontWeight.w700,
-            fontSize: 13,
+            letterSpacing: 1.5,
+            color: Color(0xFF94A3B8),
           ),
         ),
-        Text(
-          etiqueta,
-          style: theme.textTheme.bodySmall?.copyWith(
-            fontSize: 11,
-            color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
-          ),
+        const SizedBox(height: 6),
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.baseline,
+          textBaseline: TextBaseline.alphabetic,
+          children: [
+            Text(
+              value,
+              style: const TextStyle(
+                fontSize: 32,
+                fontWeight: FontWeight.w700,
+                color: Colors.white,
+                height: 1.0,
+              ),
+            ),
+            const SizedBox(width: 4),
+            Text(
+              unit,
+              style: const TextStyle(
+                fontSize: 11,
+                fontWeight: FontWeight.w600,
+                color: Color(0xFF64748B),
+              ),
+            ),
+          ],
         ),
       ],
     );
   }
 }
 
-class _Divisor extends StatelessWidget {
+// ─── Botón flotante del mapa ───────────────────────────────────────
+
+class _MapFabButton extends StatelessWidget {
+  final IconData icon;
+  final bool active;
+  final VoidCallback onTap;
+  const _MapFabButton({required this.icon, required this.active, required this.onTap});
+
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: 1,
-      height: 36,
-      color: Theme.of(context).colorScheme.outline,
+    return GestureDetector(
+      onTap: onTap,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(12),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+          child: Container(
+            width: 44,
+            height: 44,
+            decoration: BoxDecoration(
+              color: const Color(0xFF020617).withOpacity(0.7),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: Colors.white.withOpacity(0.06)),
+            ),
+            child: Icon(
+              icon,
+              size: 20,
+              color: active ? const Color(0xFF62DF7D) : Colors.white,
+            ),
+          ),
+        ),
+      ),
     );
   }
 }
 
-/// Panel de botones de control adaptados al estado actual.
+// ─── Chip señal GPS ────────────────────────────────────────────────
+
+class _GpsChip extends StatefulWidget {
+  final bool grabando;
+  const _GpsChip({required this.grabando});
+
+  @override
+  State<_GpsChip> createState() => _GpsChipState();
+}
+
+class _GpsChipState extends State<_GpsChip> with SingleTickerProviderStateMixin {
+  late final AnimationController _ctrl;
+  late final Animation<double> _opacity;
+
+  @override
+  void initState() {
+    super.initState();
+    _ctrl = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 900),
+    )..repeat(reverse: true);
+    _opacity = Tween<double>(begin: 0.3, end: 1.0).animate(_ctrl);
+  }
+
+  @override
+  void dispose() {
+    _ctrl.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    const chipColor = Color(0xFFFD761A);
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      decoration: BoxDecoration(
+        color: chipColor.withOpacity(0.15),
+        borderRadius: BorderRadius.circular(999),
+        border: Border.all(color: chipColor.withOpacity(0.3)),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          AnimatedBuilder(
+            animation: _opacity,
+            builder: (_, __) => Opacity(
+              opacity: _opacity.value,
+              child: Container(
+                width: 6,
+                height: 6,
+                decoration: const BoxDecoration(
+                  color: chipColor,
+                  shape: BoxShape.circle,
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(width: 6),
+          const Text(
+            'SEÑAL GPS',
+            style: TextStyle(
+              fontSize: 9,
+              fontWeight: FontWeight.w700,
+              letterSpacing: 1.5,
+              color: chipColor,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ─── Panel de controles ────────────────────────────────────────────
+
 class _PanelControles extends StatelessWidget {
   final TrackingService tracking;
   final VoidCallback onIniciar;
@@ -470,119 +647,78 @@ class _PanelControles extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(24, 12, 24, 16),
-        child: _buildBotones(),
-      ),
-    );
-  }
-
-  Widget _buildBotones() {
-    switch (tracking.estado) {
-      case TrackingEstado.idle:
-        // Estado inicial: solo botón de iniciar
-        return SizedBox(
-          width: double.infinity,
-          height: 52,
-          child: ElevatedButton.icon(
-            onPressed: onIniciar,
-            icon: const Icon(Icons.play_arrow_rounded),
-            label: const Text('Iniciar grabación',
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: colorGrabando,
-              foregroundColor: Colors.white,
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(14)),
-            ),
-          ),
-        );
-
-      case TrackingEstado.recording:
-        // Grabando: pausar (naranja) + detener (rojo)
-        return Row(
+    return switch (tracking.estado) {
+      TrackingEstado.idle => GradientButton(
+          label: 'Iniciar grabación',
+          leading: const Icon(Icons.radio_button_checked, color: Colors.white, size: 20),
+          onPressed: onIniciar,
+        ),
+      TrackingEstado.recording => Row(
           children: [
             Expanded(
               child: SizedBox(
-                height: 52,
+                height: 56,
                 child: OutlinedButton.icon(
                   onPressed: onPausar,
                   icon: const Icon(Icons.pause_rounded),
-                  label: const Text('Pausar',
-                      style: TextStyle(fontWeight: FontWeight.w600)),
+                  label: const Text('Pausar', style: TextStyle(fontWeight: FontWeight.w600)),
                   style: OutlinedButton.styleFrom(
                     foregroundColor: colorPausado,
                     side: BorderSide(color: colorPausado, width: 2),
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(14)),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                   ),
                 ),
               ),
             ),
             const SizedBox(width: 12),
             SizedBox(
-              height: 52,
-              width: 52,
+              height: 56,
+              width: 56,
               child: ElevatedButton(
                 onPressed: onDetener,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: colorDetener,
                   foregroundColor: Colors.white,
                   padding: EdgeInsets.zero,
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(14)),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                 ),
                 child: const Icon(Icons.stop_rounded, size: 28),
               ),
             ),
           ],
-        );
-
-      case TrackingEstado.paused:
-        // Pausado: reanudar (verde) + detener (rojo)
-        return Row(
+        ),
+      TrackingEstado.paused => Row(
           children: [
             Expanded(
-              child: SizedBox(
-                height: 52,
-                child: ElevatedButton.icon(
-                  onPressed: onReanudar,
-                  icon: const Icon(Icons.play_arrow_rounded),
-                  label: const Text('Reanudar',
-                      style: TextStyle(fontWeight: FontWeight.w600)),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: colorGrabando,
-                    foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(14)),
-                  ),
-                ),
+              child: GradientButton(
+                label: 'Reanudar',
+                leading: const Icon(Icons.play_arrow_rounded, color: Colors.white, size: 20),
+                onPressed: onReanudar,
               ),
             ),
             const SizedBox(width: 12),
             SizedBox(
-              height: 52,
-              width: 52,
+              height: 56,
+              width: 56,
               child: ElevatedButton(
                 onPressed: onDetener,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: colorDetener,
                   foregroundColor: Colors.white,
                   padding: EdgeInsets.zero,
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(14)),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                 ),
                 child: const Icon(Icons.stop_rounded, size: 28),
               ),
             ),
           ],
-        );
-    }
+        ),
+    };
   }
 }
 
-/// Modal bottom sheet para nombrar y guardar la actividad al finalizar.
+// ─── Modal guardar actividad ───────────────────────────────────────
+
 class _ModalGuardarActividad extends StatelessWidget {
   final TextEditingController controlador;
   final double distanciaKm;
@@ -606,27 +742,22 @@ class _ModalGuardarActividad extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Encabezado
           Row(
             children: [
-              const Icon(Icons.check_circle_outline,
-                  color: Color(0xFF16A34A), size: 28),
+              Icon(Icons.check_circle_outline, color: theme.colorScheme.primary, size: 28),
               const SizedBox(width: 8),
               Text(
                 'Guardar actividad',
-                style: theme.textTheme.titleMedium
-                    ?.copyWith(fontWeight: FontWeight.w700),
+                style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
               ),
             ],
           ),
           const SizedBox(height: 16),
-
-          // Resumen de stats
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
               color: theme.colorScheme.primaryContainer,
-              borderRadius: BorderRadius.circular(10),
+              borderRadius: BorderRadius.circular(12),
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -643,12 +774,9 @@ class _ModalGuardarActividad extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 16),
-
-          // Campo de nombre
           Text(
             'Nombre de la actividad',
-            style: theme.textTheme.bodySmall
-                ?.copyWith(fontWeight: FontWeight.w600),
+            style: theme.textTheme.bodySmall?.copyWith(fontWeight: FontWeight.w600),
           ),
           const SizedBox(height: 6),
           TextField(
@@ -661,17 +789,7 @@ class _ModalGuardarActividad extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 16),
-
-          // Botón guardar
-          SizedBox(
-            width: double.infinity,
-            height: 48,
-            child: ElevatedButton(
-              onPressed: onGuardar,
-              child: const Text('Guardar',
-                  style: TextStyle(fontWeight: FontWeight.w700)),
-            ),
-          ),
+          GradientButton(label: 'Guardar', onPressed: onGuardar),
         ],
       ),
     );
@@ -689,7 +807,6 @@ class _ModalGuardarActividad extends StatelessWidget {
 class _ResumenStat extends StatelessWidget {
   final String valor;
   final String etiqueta;
-
   const _ResumenStat({required this.valor, required this.etiqueta});
 
   @override
@@ -697,15 +814,8 @@ class _ResumenStat extends StatelessWidget {
     final theme = Theme.of(context);
     return Column(
       children: [
-        Text(
-          valor,
-          style: theme.textTheme.titleMedium
-              ?.copyWith(fontWeight: FontWeight.w700),
-        ),
-        Text(
-          etiqueta,
-          style: theme.textTheme.bodySmall?.copyWith(fontSize: 11),
-        ),
+        Text(valor, style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700)),
+        Text(etiqueta, style: theme.textTheme.bodySmall?.copyWith(fontSize: 11)),
       ],
     );
   }

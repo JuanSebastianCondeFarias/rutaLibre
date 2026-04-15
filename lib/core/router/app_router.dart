@@ -1,6 +1,8 @@
 // apps/mobile/lib/core/router/app_router.dart
 // Configuración del router usando GoRouter
 
+import 'dart:ui';
+
 import 'package:go_router/go_router.dart';
 import 'package:flutter/material.dart';
 
@@ -134,12 +136,23 @@ class _MainShellState extends State<_MainShell> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
+      extendBody: true, // contenido pasa por detrás del nav translúcido
       body: widget.child,
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _indiceActual,
-        onTap: _navegar,
-        items: _items,
+      bottomNavigationBar: ClipRRect(
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
+          child: BottomNavigationBar(
+            backgroundColor: isDark
+                ? const Color(0xFF1E293B).withOpacity(0.85)
+                : Colors.white.withOpacity(0.85),
+            currentIndex: _indiceActual,
+            onTap: _navegar,
+            items: _items,
+          ),
+        ),
       ),
     );
   }
