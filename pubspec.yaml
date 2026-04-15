@@ -1,0 +1,98 @@
+# apps/mobile/pubspec.yaml
+# Dependencias Flutter para RutaLibre
+
+name: rutalibre
+description: "Plataforma opensource de rutas ciclistas para Colombia. Pedalea sin límites."
+version: 0.1.0+1
+publish_to: "none"
+
+environment:
+  sdk: ">=3.2.0 <4.0.0"
+  flutter: ">=3.16.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+
+  # ─── Mapas ─────────────────────────────────────────────────
+  flutter_map: ^6.1.0
+  latlong2: ^0.9.0
+
+  # ─── HTTP ──────────────────────────────────────────────────
+  dio: ^5.4.0
+  retrofit: ^4.1.0
+  http: ^1.2.0
+
+  # ─── Estado ────────────────────────────────────────────────
+  provider: ^6.1.1
+  flutter_riverpod: ^2.4.9
+
+  # ─── Auth OAuth ────────────────────────────────────────────
+  flutter_appauth: ^7.0.1
+  flutter_secure_storage: ^9.0.0
+
+  # ─── Firebase (push notifications) ─────────────────────────
+  firebase_core: ^3.6.0
+  firebase_messaging: ^15.1.3
+
+  # ─── Localización ──────────────────────────────────────────
+  intl: ^0.20.2
+
+  # ─── Almacenamiento local ───────────────────────────────────
+  shared_preferences: ^2.2.2
+  hive_flutter: ^1.1.0
+
+  # ─── Geolocalización ───────────────────────────────────────
+  geolocator: ^11.0.0
+  permission_handler: ^11.2.0
+
+  # ─── Cámara y fotos ─────────────────────────────────────────
+  image_picker: ^1.0.7
+  cached_network_image: ^3.3.1
+
+  # ─── UI ────────────────────────────────────────────────────
+  go_router: ^13.0.0
+  # lucide_icons no existe en pub.dev — se usan Icons de Material (incluidos en Flutter)
+  google_fonts: ^6.1.0
+  shimmer: ^3.0.0
+  fl_chart: ^0.66.2
+
+  # ─── Utilidades ────────────────────────────────────────────
+  equatable: ^2.0.5
+  uuid: ^4.2.2
+  url_launcher: ^6.2.2
+  universal_html: ^2.2.4
+  path_provider: ^2.1.2
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  integration_test:
+    sdk: flutter
+  flutter_lints: ^3.0.0
+  build_runner: ^2.4.7
+  retrofit_generator: ^8.1.0
+  json_serializable: ^6.7.1
+  hive_generator: ^2.0.1
+
+flutter:
+  uses-material-design: true
+  generate: true
+
+  assets:
+    - assets/images/
+    - assets/icons/
+
+  # Fuente personalizada
+  fonts:
+    - family: Inter
+      fonts:
+        - asset: assets/fonts/Inter-Regular.ttf
+        - asset: assets/fonts/Inter-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/Inter-SemiBold.ttf
+          weight: 600
+        - asset: assets/fonts/Inter-Bold.ttf
+          weight: 700

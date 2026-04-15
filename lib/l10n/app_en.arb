@@ -1,0 +1,205 @@
+{
+  "@@locale": "en",
+  "appTitle": "RutaLibre",
+  "appTagline": "Ride without limits",
+
+  "navMap": "Map",
+  "navRoutes": "Routes",
+  "navChallenges": "Challenges",
+  "navReport": "Report",
+  "navProfile": "Profile",
+
+  "loginGoogle": "Sign in with Google",
+  "logout": "Sign out",
+  "loginRequired": "Please sign in to continue",
+
+  "routeCalculate": "Calculate route",
+  "routeOrigin": "Origin",
+  "routeDestination": "Destination",
+  "routeType": "Route type",
+  "routeStandard": "Standard",
+  "routeSafe": "Safe",
+  "routeMTB": "MTB",
+  "routeDistance": "Distance",
+  "routeTime": "Estimated time",
+  "routeElevationGain": "Ascent",
+  "routeElevationLoss": "Descent",
+  "routeCalculating": "Calculating...",
+
+  "challengesTitle": "Daily challenges",
+  "challengeCompleted": "Completed",
+  "challengeEasy": "Easy",
+  "challengeMedium": "Medium",
+  "challengeHard": "Hard",
+  "challengePoints": "{points} points",
+  "@challengePoints": {
+    "placeholders": {
+      "points": {"type": "int"}
+    }
+  },
+  "challengeGoal": "Goal: {value} {unit}",
+  "@challengeGoal": {
+    "placeholders": {
+      "value": {"type": "double"},
+      "unit": {"type": "String"}
+    }
+  },
+
+  "contributionTitle": "Report an issue",
+  "contributionHazard": "Road hazard",
+  "contributionRoadClosed": "Road closed",
+  "contributionRouteUpdate": "Outdated cycleway",
+  "contributionPoiAdd": "Suggest POI",
+  "contributionPoiUpdate": "Update POI",
+  "contributionDescription": "Description",
+  "contributionLocation": "Location",
+  "contributionPhoto": "Photo (optional)",
+  "contributionSubmit": "Submit report",
+  "contributionSuccess": "Report submitted!",
+  "contributionSuccessDesc": "The community will vote to approve it.",
+
+  "poisTitle": "Points of interest",
+  "poiRepairShop": "Bike repair shop",
+  "poiBikeStore": "Bike store",
+  "poiParking": "Bike parking",
+  "poiWaterPoint": "Water point",
+  "poiRestArea": "Rest area",
+  "poiBikeSharing": "Bike sharing",
+
+  "profileTitle": "My profile",
+  "profileKmTotal": "Total kilometers",
+  "profileRoutes": "Routes completed",
+  "profileChallenges": "Challenges completed",
+  "profileContributions": "Approved contributions",
+  "profileMemberSince": "Member since {date}",
+  "@profileMemberSince": {
+    "placeholders": {
+      "date": {"type": "String"}
+    }
+  },
+
+  "rankLevel": "Level {level}",
+  "@rankLevel": {
+    "placeholders": {
+      "level": {"type": "int"}
+    }
+  },
+  "rankNovice": "Novice Cyclist",
+  "rankRolling": "Rolling",
+  "rankExplorer": "Explorer",
+  "rankSpeedy": "Speedy",
+  "rankRacer": "Racer",
+  "rankMaster": "Asphalt Master",
+  "rankLegend": "Bogotá Legend",
+  "rankPointsToNext": "{points} pts to level {nextLevel}",
+  "@rankPointsToNext": {
+    "placeholders": {
+      "points": {"type": "int"},
+      "nextLevel": {"type": "int"}
+    }
+  },
+  "rankMaxLevel": "Maximum level reached!",
+
+  "leaderboardTitle": "Leaderboard",
+  "leaderboardPosition": "Your position: #{position} of {total} cyclists",
+  "@leaderboardPosition": {
+    "placeholders": {
+      "position": {"type": "int"},
+      "total": {"type": "int"}
+    }
+  },
+  "leaderboardPoints": "{points} pts",
+  "@leaderboardPoints": {
+    "placeholders": {
+      "points": {"type": "int"}
+    }
+  },
+
+  "contributionAll": "All",
+  "contributionPending": "Pending",
+  "contributionApproved": "Approved",
+  "contributionRejected": "Rejected",
+  "contributionVotesNeeded": "Needs {votes} more votes",
+  "@contributionVotesNeeded": {
+    "placeholders": {
+      "votes": {"type": "int"}
+    }
+  },
+  "contributionLoginToVote": "Sign in to vote",
+  "contributionNewReport": "New report",
+  "contributionNoResults": "No contributions at this time",
+  "contributionBy": "by {name}",
+  "@contributionBy": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+
+  "routeSearchPlaceholderOrigin": "E.g.: Parque de la 93, Chapinero…",
+  "routeSearchPlaceholderDest": "E.g.: Universidad Nacional, Teusaquillo…",
+  "routeReady": "Route ready",
+  "routeStartNav": "Start navigation",
+  "routeStopNav": "Stop tracking",
+  "routeNewRoute": "New route",
+  "routeCurrentSpeed": "Current speed",
+  "routeSearching": "Searching…",
+  "routeNoResults": "No results — try a neighborhood or nearby landmark",
+
+  "poisMap": "Map",
+  "poisList": "List",
+  "poisMyLocation": "My location",
+  "poisMyLocationActive": "My location active",
+  "poisRadius": "Radius",
+  "poisReportPOI": "Report POI",
+  "poisReportTapMap": "Tap the map where the POI is",
+  "poisReportName": "POI name",
+  "poisReportPhone": "Phone",
+  "poisReportSchedule": "Schedule",
+  "poisNearby": "Showing {count} POIs within {distance}",
+  "@poisNearby": {
+    "placeholders": {
+      "count": {"type": "int"},
+      "distance": {"type": "String"}
+    }
+  },
+  "poisNoPoisNearby": "No POIs of this type within {distance}",
+  "@poisNoPoisNearby": {
+    "placeholders": {
+      "distance": {"type": "String"}
+    }
+  },
+  "poisNoPoisCity": "No POIs of this type in {city}",
+  "@poisNoPoisCity": {
+    "placeholders": {
+      "city": {"type": "String"}
+    }
+  },
+
+  "cityBanner": "{name}",
+  "@cityBanner": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "cityElevation": "{elevation} m a.s.l.",
+  "@cityElevation": {
+    "placeholders": {
+      "elevation": {"type": "int"}
+    }
+  },
+  "cityCicloviaSundays": "Ciclovia on Sundays and holidays",
+  "citySelectTitle": "Change city",
+
+  "loginHint": "Sign in to save your progress and earn points",
+
+  "loading": "Loading...",
+  "retry": "Retry",
+  "cancel": "Cancel",
+  "save": "Save",
+  "close": "Close",
+  "useMyLocation": "Use my location",
+  "myLocation": "My location",
+  "darkMode": "Dark mode",
+  "lightMode": "Light mode",
+  "selectCity": "Select city"
+}

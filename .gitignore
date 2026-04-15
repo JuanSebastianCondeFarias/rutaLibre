@@ -1,0 +1,76 @@
+# ─── Variables de entorno y archivos sensibles ─────────────────
+.env
+.env.*
+.env.local
+.env.*.local
+*.env
+
+# Credenciales Firebase (nunca subir al repo)
+google-services.json
+GoogleService-Info.plist
+
+# Claves de API y secretos
+*.keystore
+*.jks
+key.properties
+*.p8
+*.p12
+*.cer
+*.mobileprovision
+
+# ─── Flutter / Dart ─────────────────────────────────────────────
+**/doc/api/
+**/ios/Flutter/.last_build_id
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.pub-cache/
+.pub/
+/build/
+/coverage/
+
+# Symbolication y obfuscation
+app.*.symbols
+app.*.map.json
+
+# ─── iOS ────────────────────────────────────────────────────────
+ios/Pods/
+ios/.symlinks/
+ios/Flutter/Flutter.framework
+ios/Flutter/Flutter.podspec
+ios/Runner/GeneratedPluginRegistrant.*
+ios/Flutter/App.framework
+ios/Flutter/ephemeral/
+
+# ─── Android ────────────────────────────────────────────────────
+android/.gradle/
+android/app/debug/
+android/app/profile/
+android/app/release/
+android/local.properties
+android/key.properties
+
+# ─── macOS ──────────────────────────────────────────────────────
+macos/Pods/
+macos/.symlinks/
+macos/Flutter/GeneratedPluginRegistrant.swift
+macos/Flutter/ephemeral/
+
+# ─── Editores e IDEs ────────────────────────────────────────────
+.idea/
+.vscode/
+*.iml
+*.ipr
+*.iws
+.DS_Store
+.atom/
+.history
+.svn/
+.swiftpm/
+migrate_working_dir/
+
+# ─── Logs ───────────────────────────────────────────────────────
+*.class
+*.log
+*.pyc
+*.swp

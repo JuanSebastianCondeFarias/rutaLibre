@@ -1,0 +1,207 @@
+{
+  "@@locale": "es",
+  "appTitle": "RutaLibre",
+  "@appTitle": {"description": "Nombre de la aplicación"},
+  "appTagline": "Pedalea sin límites",
+  "@appTagline": {"description": "Eslogan de la aplicación"},
+
+  "navMap": "Mapa",
+  "navRoutes": "Rutas",
+  "navChallenges": "Retos",
+  "navReport": "Reportar",
+  "navProfile": "Perfil",
+
+  "loginGoogle": "Entrar con Google",
+  "logout": "Cerrar sesión",
+  "loginRequired": "Inicia sesión para continuar",
+
+  "routeCalculate": "Calcular ruta",
+  "routeOrigin": "Origen",
+  "routeDestination": "Destino",
+  "routeType": "Tipo de ruta",
+  "routeStandard": "Estándar",
+  "routeSafe": "Seguro",
+  "routeMTB": "MTB",
+  "routeDistance": "Distancia",
+  "routeTime": "Tiempo estimado",
+  "routeElevationGain": "Subida",
+  "routeElevationLoss": "Bajada",
+  "routeCalculating": "Calculando...",
+
+  "challengesTitle": "Retos diarios",
+  "challengeCompleted": "Completado",
+  "challengeEasy": "Fácil",
+  "challengeMedium": "Medio",
+  "challengeHard": "Difícil",
+  "challengePoints": "{points} puntos",
+  "@challengePoints": {
+    "placeholders": {
+      "points": {"type": "int"}
+    }
+  },
+  "challengeGoal": "Meta: {value} {unit}",
+  "@challengeGoal": {
+    "placeholders": {
+      "value": {"type": "double"},
+      "unit": {"type": "String"}
+    }
+  },
+
+  "contributionTitle": "Reportar novedad",
+  "contributionHazard": "Peligro en vía",
+  "contributionRoadClosed": "Vía cerrada",
+  "contributionRouteUpdate": "Ciclorruta desactualizada",
+  "contributionPoiAdd": "Sugerir POI",
+  "contributionPoiUpdate": "Actualizar POI",
+  "contributionDescription": "Descripción",
+  "contributionLocation": "Ubicación",
+  "contributionPhoto": "Foto (opcional)",
+  "contributionSubmit": "Enviar reporte",
+  "contributionSuccess": "¡Reporte enviado!",
+  "contributionSuccessDesc": "La comunidad votará para aprobarlo.",
+
+  "poisTitle": "Puntos de interés",
+  "poiRepairShop": "Taller de bicicletas",
+  "poiBikeStore": "Tienda de accesorios",
+  "poiParking": "Parqueadero",
+  "poiWaterPoint": "Fuente de agua",
+  "poiRestArea": "Zona de descanso",
+  "poiBikeSharing": "Bicicleta compartida",
+
+  "profileTitle": "Mi perfil",
+  "profileKmTotal": "Kilómetros totales",
+  "profileRoutes": "Rutas completadas",
+  "profileChallenges": "Retos completados",
+  "profileContributions": "Contribuciones aprobadas",
+  "profileMemberSince": "Miembro desde {date}",
+  "@profileMemberSince": {
+    "placeholders": {
+      "date": {"type": "String"}
+    }
+  },
+
+  "rankLevel": "Nivel {level}",
+  "@rankLevel": {
+    "placeholders": {
+      "level": {"type": "int"}
+    }
+  },
+  "rankNovice": "Ciclista Novato",
+  "rankRolling": "Rodante",
+  "rankExplorer": "Explorador",
+  "rankSpeedy": "Veloz",
+  "rankRacer": "Corredor",
+  "rankMaster": "Maestro del Asfalto",
+  "rankLegend": "Leyenda de Bogotá",
+  "rankPointsToNext": "Faltan {points} pts para nivel {nextLevel}",
+  "@rankPointsToNext": {
+    "placeholders": {
+      "points": {"type": "int"},
+      "nextLevel": {"type": "int"}
+    }
+  },
+  "rankMaxLevel": "¡Nivel máximo alcanzado!",
+
+  "leaderboardTitle": "Clasificación",
+  "leaderboardPosition": "Tu posición: #{position} de {total} ciclistas",
+  "@leaderboardPosition": {
+    "placeholders": {
+      "position": {"type": "int"},
+      "total": {"type": "int"}
+    }
+  },
+  "leaderboardPoints": "{points} pts",
+  "@leaderboardPoints": {
+    "placeholders": {
+      "points": {"type": "int"}
+    }
+  },
+
+  "contributionAll": "Todos",
+  "contributionPending": "Pendientes",
+  "contributionApproved": "Aprobados",
+  "contributionRejected": "Rechazados",
+  "contributionVotesNeeded": "Necesita {votes} votos más",
+  "@contributionVotesNeeded": {
+    "placeholders": {
+      "votes": {"type": "int"}
+    }
+  },
+  "contributionLoginToVote": "Inicia sesión para votar",
+  "contributionNewReport": "Nuevo reporte",
+  "contributionNoResults": "No hay contribuciones en este momento",
+  "contributionBy": "por {name}",
+  "@contributionBy": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+
+  "routeSearchPlaceholderOrigin": "Ej: Parque de la 93, Chapinero…",
+  "routeSearchPlaceholderDest": "Ej: Universidad Nacional, Teusaquillo…",
+  "routeReady": "Ruta lista",
+  "routeStartNav": "Iniciar navegación",
+  "routeStopNav": "Detener seguimiento",
+  "routeNewRoute": "Nueva ruta",
+  "routeCurrentSpeed": "Velocidad actual",
+  "routeSearching": "Buscando…",
+  "routeNoResults": "Sin resultados — prueba con el barrio o una referencia cercana",
+
+  "poisMap": "Mapa",
+  "poisList": "Lista",
+  "poisMyLocation": "Mi ubicación",
+  "poisMyLocationActive": "Mi ubicación activa",
+  "poisRadius": "Radio",
+  "poisReportPOI": "Reportar POI",
+  "poisReportTapMap": "Toca el mapa donde está el POI",
+  "poisReportName": "Nombre del POI",
+  "poisReportPhone": "Teléfono",
+  "poisReportSchedule": "Horario",
+  "poisNearby": "Mostrando {count} POIs a menos de {distance}",
+  "@poisNearby": {
+    "placeholders": {
+      "count": {"type": "int"},
+      "distance": {"type": "String"}
+    }
+  },
+  "poisNoPoisNearby": "No hay POIs de este tipo a menos de {distance}",
+  "@poisNoPoisNearby": {
+    "placeholders": {
+      "distance": {"type": "String"}
+    }
+  },
+  "poisNoPoisCity": "No hay POIs de este tipo en {city}",
+  "@poisNoPoisCity": {
+    "placeholders": {
+      "city": {"type": "String"}
+    }
+  },
+
+  "cityBanner": "{name}",
+  "@cityBanner": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "cityElevation": "{elevation} m s.n.m.",
+  "@cityElevation": {
+    "placeholders": {
+      "elevation": {"type": "int"}
+    }
+  },
+  "cityCicloviaSundays": "Ciclovía domingos y festivos",
+  "citySelectTitle": "Cambiar ciudad",
+
+  "loginHint": "Inicia sesión para guardar tu progreso y ganar puntos",
+
+  "loading": "Cargando...",
+  "retry": "Reintentar",
+  "cancel": "Cancelar",
+  "save": "Guardar",
+  "close": "Cerrar",
+  "useMyLocation": "Usar mi ubicación",
+  "myLocation": "Mi ubicación",
+  "darkMode": "Modo oscuro",
+  "lightMode": "Modo claro",
+  "selectCity": "Seleccionar ciudad"
+}
