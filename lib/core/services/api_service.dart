@@ -47,6 +47,137 @@ class ApiService {
     'created_at': '2024-09-01T00:00:00Z',
   };
 
+  static const List<Map<String, dynamic>> _mockRetos = [
+    {
+      'id': 1,
+      'titulo': 'Recorre 10 km sin parar',
+      'descripcion': 'Completa un recorrido continuo de al menos 10 km en Bogotá.',
+      'tipo': 'distancia',
+      'dificultad': 'facil',
+      'meta_valor': 10,
+      'meta_unidad': 'km',
+      'mi_progreso': 10.0,
+      'completado': true,
+      'puntos_recompensa': 50,
+    },
+    {
+      'id': 2,
+      'titulo': 'Velocidad crucero',
+      'descripcion': 'Mantén una velocidad promedio de 20 km/h durante toda una rodada.',
+      'tipo': 'velocidad',
+      'dificultad': 'medio',
+      'meta_valor': 20,
+      'meta_unidad': 'km/h',
+      'mi_progreso': 16.5,
+      'completado': false,
+      'puntos_recompensa': 100,
+    },
+    {
+      'id': 3,
+      'titulo': 'Escalador urbano',
+      'descripcion': 'Acumula 200 metros de desnivel positivo en una sola actividad.',
+      'tipo': 'desnivel',
+      'dificultad': 'dificil',
+      'meta_valor': 200,
+      'meta_unidad': 'm',
+      'mi_progreso': 120.0,
+      'completado': false,
+      'puntos_recompensa': 200,
+    },
+    {
+      'id': 4,
+      'titulo': 'Explorador de POIs',
+      'descripcion': 'Visita 3 puntos de interés ciclista en la ciudad.',
+      'tipo': 'puntos_de_interes',
+      'dificultad': 'facil',
+      'meta_valor': 3,
+      'meta_unidad': 'POIs',
+      'mi_progreso': 3.0,
+      'completado': true,
+      'puntos_recompensa': 75,
+    },
+    {
+      'id': 5,
+      'titulo': 'Gran fondo',
+      'descripcion': 'Completa una rodada de 30 km en menos de 2 horas.',
+      'tipo': 'distancia',
+      'dificultad': 'dificil',
+      'meta_valor': 30,
+      'meta_unidad': 'km',
+      'mi_progreso': 12.3,
+      'completado': false,
+      'puntos_recompensa': 300,
+    },
+  ];
+
+  static const Map<String, dynamic> _mockLeaderboard = {
+    'mi_posicion': 7,
+    'total_usuarios': 342,
+    'entries': [
+      {'posicion': 1, 'nombre': 'Andrés Pedraza',   'foto_url': null, 'puntos': 8420, 'nivel': 8, 'rango': 'Maestro del Asfalto',  'km_totales': 1240.5},
+      {'posicion': 2, 'nombre': 'Valentina Cruz',   'foto_url': null, 'puntos': 7850, 'nivel': 7, 'rango': 'Ciclista Élite',       'km_totales': 1105.0},
+      {'posicion': 3, 'nombre': 'Carlos Monsalve',  'foto_url': null, 'puntos': 6340, 'nivel': 7, 'rango': 'Ciclista Élite',       'km_totales':  980.3},
+      {'posicion': 4, 'nombre': 'Luisa Fernanda',   'foto_url': null, 'puntos': 4210, 'nivel': 5, 'rango': 'Rodador Frecuente',    'km_totales':  620.8},
+      {'posicion': 5, 'nombre': 'Juan Gómez',       'foto_url': null, 'puntos': 3100, 'nivel': 5, 'rango': 'Rodador Frecuente',    'km_totales':  455.2},
+      {'posicion': 6, 'nombre': 'María Salcedo',    'foto_url': null, 'puntos': 1890, 'nivel': 4, 'rango': 'Ciclista Urbano',      'km_totales':  278.1},
+      {'posicion': 7, 'nombre': 'Ciclista Demo',    'foto_url': null, 'puntos': 1250, 'nivel': 3, 'rango': 'Ciclista Avanzado',    'km_totales':  142.5},
+      {'posicion': 8, 'nombre': 'Ricardo Herrera',  'foto_url': null, 'puntos':  980, 'nivel': 2, 'rango': 'Ciclista Novato',      'km_totales':   95.0},
+      {'posicion': 9, 'nombre': 'Diana López',      'foto_url': null, 'puntos':  750, 'nivel': 2, 'rango': 'Ciclista Novato',      'km_totales':   72.4},
+      {'posicion':10, 'nombre': 'Pablo Nieto',      'foto_url': null, 'puntos':  520, 'nivel': 1, 'rango': 'Pedaleando',           'km_totales':   45.0},
+    ],
+  };
+
+  static const List<Map<String, dynamic>> _mockContribuciones = [
+    {
+      'id': 101,
+      'tipo': 'hazard',
+      'descripcion': 'Hueco profundo en la ciclovía de la Calle 26 a la altura de la carrera 30.',
+      'estado': 'approved',
+      'lat': 4.6297,
+      'lng': -74.1017,
+      'votos_positivos': 12,
+      'votos_negativos': 1,
+      'foto_url': null,
+      'created_at': '2024-10-15T09:30:00Z',
+    },
+    {
+      'id': 102,
+      'tipo': 'route_update',
+      'descripcion': 'Nuevo tramo de ciclovía habilitado en la Av. Boyacá entre calles 80 y 100.',
+      'estado': 'approved',
+      'lat': 4.7012,
+      'lng': -74.0897,
+      'votos_positivos': 24,
+      'votos_negativos': 0,
+      'foto_url': null,
+      'created_at': '2024-10-20T14:00:00Z',
+    },
+    {
+      'id': 103,
+      'tipo': 'poi_add',
+      'descripcion': 'Bicicletero nuevo en el Parque Nacional con capacidad para 20 bicicletas.',
+      'estado': 'pending',
+      'lat': 4.6151,
+      'lng': -74.0722,
+      'votos_positivos': 5,
+      'votos_negativos': 0,
+      'foto_url': null,
+      'created_at': '2024-11-01T11:00:00Z',
+    },
+    {
+      'id': 104,
+      'tipo': 'road_closed',
+      'descripcion': 'Cierre temporal de la ciclovía del Parque Simón Bolívar por obras de mantenimiento.',
+      'estado': 'stale',
+      'lat': 4.6582,
+      'lng': -74.0961,
+      'votos_positivos': 8,
+      'votos_negativos': 3,
+      'foto_url': null,
+      'created_at': '2024-09-10T08:00:00Z',
+    },
+  ];
+
   final FlutterSecureStorage _storage;
   late final Dio _dio;
 
@@ -197,6 +328,7 @@ class ApiService {
 
   /// Lista los retos del día.
   Future<List<dynamic>> listarRetos(String city) async {
+    if (await esModoDemo) return List<Map<String, dynamic>>.from(_mockRetos);
     final response = await get<List<dynamic>>(
       '/challenges',
       queryParams: {'city': city},
@@ -247,6 +379,12 @@ class ApiService {
     String city, {
     String? estado,
   }) async {
+    if (await esModoDemo) {
+      final items = estado == null || estado.isEmpty
+          ? _mockContribuciones
+          : _mockContribuciones.where((c) => c['estado'] == estado).toList();
+      return {'items': List<Map<String, dynamic>>.from(items), 'total': items.length};
+    }
     final params = <String, dynamic>{'city': city};
     if (estado != null && estado.isNotEmpty) params['estado'] = estado;
     final response = await get<Map<String, dynamic>>(
@@ -272,6 +410,7 @@ class ApiService {
 
   /// Obtiene el leaderboard de una ciudad.
   Future<Map<String, dynamic>> leaderboard(String city, {int limite = 20}) async {
+    if (await esModoDemo) return Map<String, dynamic>.from(_mockLeaderboard);
     final response = await get<Map<String, dynamic>>(
       '/challenges/leaderboard',
       queryParams: {'city': city, 'limit': limite},

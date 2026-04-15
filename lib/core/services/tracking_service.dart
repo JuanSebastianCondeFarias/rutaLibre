@@ -6,6 +6,7 @@ import 'dart:convert';
 import 'dart:math' as math;
 
 import 'package:flutter/foundation.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:latlong2/latlong.dart';
@@ -150,7 +151,12 @@ class TrackingService extends ChangeNotifier {
   }
 
   /// Retorna todas las actividades guardadas en Hive ordenadas por fecha descendente.
+  /// En modo demo devuelve actividades de prueba con rutas reales de Bogotá.
   Future<List<ActivityRecord>> cargarActividades() async {
+    const storage = FlutterSecureStorage();
+    final token = await storage.read(key: 'access_token');
+    if (token == 'mock_demo_v1') return _actividadesDemo();
+
     final box = await _abrirBox();
     final actividades = box.values
         .map((raw) {
@@ -165,9 +171,85 @@ class TrackingService extends ChangeNotifier {
         .whereType<ActivityRecord>()
         .toList();
 
-    // Ordenar por fecha de inicio descendente (más reciente primero)
     actividades.sort((a, b) => b.startedAt.compareTo(a.startedAt));
     return actividades;
+  }
+
+  /// Actividades de prueba con trayectos reales en Bogotá.
+  List<ActivityRecord> _actividadesDemo() {
+    final ahora = DateTime.now();
+    return [
+      ActivityRecord(
+        id: 'demo-act-001',
+        citySlug: 'bogota',
+        title: 'Rodada matutina',
+        startedAt: ahora.subtract(const Duration(days: 3, hours: 7)),
+        endedAt: ahora.subtract(const Duration(days: 3, hours: 6, minutes: 18)),
+        distanceKm: 12.4,
+        durationSeconds: 2520, // 42 min
+        avgSpeedKmh: 17.7,
+        // Ciclovía Carrera 7 — Calle 100 hacia el sur
+        points: const [
+          [4.6800, -74.0490], [4.6771, -74.0497], [4.6743, -74.0504],
+          [4.6714, -74.0511], [4.6686, -74.0518], [4.6657, -74.0525],
+          [4.6629, -74.0532], [4.6600, -74.0539], [4.6572, -74.0546],
+          [4.6543, -74.0553], [4.6515, -74.0560], [4.6486, -74.0567],
+          [4.6458, -74.0574], [4.6429, -74.0581],
+        ],
+      ),
+      ActivityRecord(
+        id: 'demo-act-002',
+        citySlug: 'bogota',
+        title: 'Vuelta al Simón Bolívar',
+        startedAt: ahora.subtract(const Duration(days: 8, hours: 16)),
+        endedAt: ahora.subtract(const Duration(days: 8, hours: 15, minutes: 30)),
+        distanceKm: 8.1,
+        durationSeconds: 1800, // 30 min
+        avgSpeedKmh: 16.2,
+        // Loop alrededor del Parque Simón Bolívar
+        points: const [
+          [4.6583, -74.0931], [4.6617, -74.0948], [4.6648, -74.0965],
+          [4.6665, -74.0994], [4.6660, -74.1028], [4.6641, -74.1055],
+          [4.6613, -74.1066], [4.6582, -74.1063], [4.6553, -74.1048],
+          [4.6535, -74.1021], [4.6530, -74.0988], [4.6540, -74.0958],
+          [4.6558, -74.0939], [4.6583, -74.0931],
+        ],
+      ),
+      ActivityRecord(
+        id: 'demo-act-003',
+        citySlug: 'bogota',
+        title: 'Rodada nocturna',
+        startedAt: ahora.subtract(const Duration(days: 14, hours: 20)),
+        endedAt: ahora.subtract(const Duration(days: 14, hours: 19, minutes: 40)),
+        distanceKm: 5.5,
+        durationSeconds: 1200, // 20 min
+        avgSpeedKmh: 16.5,
+        // Calle 26 — de Carrera 7 hacia occidente
+        points: const [
+          [4.6283, -74.0662], [4.6285, -74.0698], [4.6287, -74.0734],
+          [4.6289, -74.0770], [4.6291, -74.0806], [4.6293, -74.0842],
+          [4.6295, -74.0878], [4.6297, -74.0914], [4.6299, -74.0950],
+          [4.6301, -74.0986],
+        ],
+      ),
+      ActivityRecord(
+        id: 'demo-act-004',
+        citySlug: 'bogota',
+        title: 'Rodada de la tarde',
+        startedAt: ahora.subtract(const Duration(days: 21, hours: 15)),
+        endedAt: ahora.subtract(const Duration(days: 21, hours: 14, minutes: 25)),
+        distanceKm: 9.8,
+        durationSeconds: 2100, // 35 min
+        avgSpeedKmh: 16.8,
+        // Av. NQS (Carrera 30) de norte a sur
+        points: const [
+          [4.6820, -74.0985], [4.6783, -74.0985], [4.6746, -74.0986],
+          [4.6709, -74.0987], [4.6672, -74.0988], [4.6635, -74.0989],
+          [4.6598, -74.0990], [4.6561, -74.0991], [4.6524, -74.0992],
+          [4.6487, -74.0993], [4.6450, -74.0994],
+        ],
+      ),
+    ];
   }
 
   /// Elimina una actividad de Hive por su [id].
