@@ -127,6 +127,105 @@ class ApiService {
     ],
   };
 
+  static const List<Map<String, dynamic>> _mockPois = [
+    {
+      'id': 'poi-001',
+      'tipo': 'repair_shop',
+      'nombre': 'Cicloservicio El Caño',
+      'direccion': 'Calle 72 # 7-42, Chapinero',
+      'descripcion': 'Taller especializado en bicicletas de ruta y montaña. Mantenimiento express.',
+      'lat': 4.6497,
+      'lng': -74.0556,
+      'horario': 'Lun-Sáb 8am-6pm',
+      'telefono': '310 555 0101',
+      'rating_promedio': 4.7,
+    },
+    {
+      'id': 'poi-002',
+      'tipo': 'bike_store',
+      'nombre': 'Trek Bogotá Norte',
+      'direccion': 'Av. Chile # 11-27, Chapinero',
+      'descripcion': 'Tienda oficial Trek. Venta, accesorios y repuestos originales.',
+      'lat': 4.6580,
+      'lng': -74.0530,
+      'horario': 'Lun-Dom 9am-7pm',
+      'telefono': '601 800 1234',
+      'rating_promedio': 4.5,
+    },
+    {
+      'id': 'poi-003',
+      'tipo': 'parking',
+      'nombre': 'Bicicletero Parque de la 93',
+      'direccion': 'Parque de la 93, Usaquén',
+      'descripcion': 'Bicicletero con candado y vigilancia. Capacidad 30 bicicletas.',
+      'lat': 4.6762,
+      'lng': -74.0484,
+      'horario': '24 horas',
+      'telefono': null,
+      'rating_promedio': 4.2,
+    },
+    {
+      'id': 'poi-004',
+      'tipo': 'water_point',
+      'nombre': 'Punto de agua Ciclovía Norte',
+      'direccion': 'Carrera 7 con Calle 85',
+      'descripcion': 'Bebedero gratuito con agua potable. Activo todos los domingos ciclovía.',
+      'lat': 4.6693,
+      'lng': -74.0507,
+      'horario': 'Dom 7am-2pm',
+      'telefono': null,
+      'rating_promedio': 4.0,
+    },
+    {
+      'id': 'poi-005',
+      'tipo': 'rest_area',
+      'nombre': 'Zona descanso Parque El Virrey',
+      'direccion': 'Parque El Virrey, Calle 90',
+      'descripcion': 'Bancas, sombra y baños públicos. Punto de encuentro de rodadores.',
+      'lat': 4.6735,
+      'lng': -74.0499,
+      'horario': '6am-9pm',
+      'telefono': null,
+      'rating_promedio': 4.6,
+    },
+    {
+      'id': 'poi-006',
+      'tipo': 'bike_sharing',
+      'nombre': 'Estación Tembici Usaquén',
+      'direccion': 'Calle 116 # 15-10',
+      'descripcion': 'Estación de bicicletas compartidas Tembici. 15 bicicletas disponibles.',
+      'lat': 4.6941,
+      'lng': -74.0437,
+      'horario': '24 horas',
+      'telefono': null,
+      'rating_promedio': 4.1,
+    },
+    {
+      'id': 'poi-007',
+      'tipo': 'repair_shop',
+      'nombre': 'Taller Rueda Libre',
+      'direccion': 'Carrera 13 # 63-41, Chapinero',
+      'descripcion': 'Reparaciones rápidas, inflado gratis, ajuste de cambios y frenos.',
+      'lat': 4.6441,
+      'lng': -74.0572,
+      'horario': 'Lun-Vie 9am-5pm',
+      'telefono': '315 444 9988',
+      'rating_promedio': 4.3,
+    },
+    {
+      'id': 'poi-008',
+      'tipo': 'parking',
+      'nombre': 'Bicicletero Centro Comercial Andino',
+      'direccion': 'CC Andino, Carrera 11 # 82-71',
+      'descripcion': 'Parqueadero cubierto y vigilado en sótano. Acceso desde Calle 82.',
+      'lat': 4.6661,
+      'lng': -74.0528,
+      'horario': 'Lun-Dom 10am-9pm',
+      'telefono': null,
+      'rating_promedio': 3.9,
+    },
+  ];
+
   static const List<Map<String, dynamic>> _mockContribuciones = [
     {
       'id': 101,
@@ -320,6 +419,11 @@ class ApiService {
 
   /// Lista POIs de una ciudad.
   Future<List<dynamic>> listarPois(String city, {String? tipo}) async {
+    if (await esModoDemo) {
+      return tipo == null || tipo.isEmpty
+          ? List<Map<String, dynamic>>.from(_mockPois)
+          : _mockPois.where((p) => p['tipo'] == tipo).toList();
+    }
     final params = <String, dynamic>{'city': city};
     if (tipo != null) params['tipo'] = tipo;
     final response = await get<Map<String, dynamic>>('/pois', queryParams: params);
@@ -426,6 +530,11 @@ class ApiService {
     double? lng,
     double? radioKm,
   }) async {
+    if (await esModoDemo) {
+      return tipo == null || tipo.isEmpty
+          ? List<Map<String, dynamic>>.from(_mockPois)
+          : _mockPois.where((p) => p['tipo'] == tipo).toList();
+    }
     final params = <String, dynamic>{'city': city};
     if (tipo != null && tipo.isNotEmpty) params['tipo'] = tipo;
     if (lat != null) params['lat'] = lat;

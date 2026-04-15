@@ -145,7 +145,7 @@ class _PoisScreenState extends State<PoisScreen> {
     final isDark = themeProvider.isDark;
 
     final tileUrl = isDark
-        ? 'https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png'
+        ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
         : 'https://tile.openstreetmap.org/{z}/{x}/{y}.png';
 
     return Scaffold(
@@ -330,7 +330,9 @@ class _PoisScreenState extends State<PoisScreen> {
           children: [
             TileLayer(
               urlTemplate: tileUrl,
-              subdomains: const ['a', 'b', 'c'],
+              subdomains: isDark
+                  ? const ['a', 'b', 'c', 'd']
+                  : const ['a', 'b', 'c'],
               userAgentPackageName: 'co.rutalibre.app',
             ),
             // Marcadores de POIs
