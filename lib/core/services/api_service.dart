@@ -28,6 +28,25 @@ class ApiService {
   static const String _tokenKey = 'access_token';
   static const String _refreshTokenKey = 'refresh_token';
 
+  // ─── Usuario demo (sin backend) ────────────────────────────
+  static const String _mockToken = 'mock_demo_v1';
+
+  static const Map<String, dynamic> _mockUserData = {
+    'id': 'demo-001',
+    'nombre': 'Ciclista Demo',
+    'email': 'demo@rutalibre.co',
+    'foto_url': null,
+    'nivel': 3,
+    'rango': 'Ciclista Avanzado',
+    'puntos': 1250,
+    'puntos_para_subir': 2000,
+    'km_totales': 142.5,
+    'rutas_completadas': 12,
+    'retos_completados': 5,
+    'contribuciones_aprobadas': 8,
+    'created_at': '2024-09-01T00:00:00Z',
+  };
+
   final FlutterSecureStorage _storage;
   late final Dio _dio;
 
@@ -114,6 +133,18 @@ class ApiService {
     return token != null;
   }
 
+  /// Inicia sesión con el usuario demo local (sin backend).
+  Future<void> loginComoDemo() async {
+    await _storage.write(key: _tokenKey, value: _mockToken);
+    await _storage.write(key: _refreshTokenKey, value: 'mock_refresh_v1');
+  }
+
+  /// True si la sesión activa es la del usuario demo.
+  Future<bool> get esModoDemo async {
+    final token = await _storage.read(key: _tokenKey);
+    return token == _mockToken;
+  }
+
   // ─── Métodos HTTP genéricos ─────────────────────────────────
 
   Future<Response<T>> get<T>(
@@ -174,7 +205,9 @@ class ApiService {
   }
 
   /// Obtiene el perfil del usuario autenticado.
+  /// Devuelve datos mock si la sesión es demo.
   Future<Map<String, dynamic>> miPerfil() async {
+    if (await esModoDemo) return Map<String, dynamic>.from(_mockUserData);
     final response = await get<Map<String, dynamic>>('/users/me');
     return response.data!;
   }

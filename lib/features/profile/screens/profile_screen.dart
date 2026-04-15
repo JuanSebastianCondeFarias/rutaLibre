@@ -10,6 +10,7 @@ import 'package:universal_html/html.dart' as html;
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../../core/services/api_service.dart';
+import '../../../core/widgets/gradient_button.dart';
 import '../widgets/rank_widget.dart';
 
 /// Pantalla de perfil del usuario con estadísticas y rango.
@@ -25,6 +26,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Map<String, dynamic>? _perfil;
   bool _cargando = true;
   bool _autenticado = false;
+  bool _esDemo = false;
 
   @override
   void initState() {
@@ -42,11 +44,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
 
     try {
+      final esDemo = await _apiService.esModoDemo;
       final perfil = await _apiService.miPerfil();
       if (mounted) {
         setState(() {
           _perfil = perfil;
           _autenticado = true;
+          _esDemo = esDemo;
         });
       }
     } catch (_) {
@@ -55,6 +59,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
     } finally {
       if (mounted) setState(() => _cargando = false);
     }
+  }
+
+  Future<void> _loginDemo() async {
+    await _apiService.loginComoDemo();
+    await _cargarPerfil();
   }
 
   Future<void> _loginGoogle() async {
@@ -93,7 +102,32 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Mi perfil'),
+        title: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text('Mi perfil'),
+            if (_esDemo) ...[
+              const SizedBox(width: 8),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFFD761A).withOpacity(0.15),
+                  borderRadius: BorderRadius.circular(6),
+                  border: Border.all(color: const Color(0xFFFD761A).withOpacity(0.4)),
+                ),
+                child: const Text(
+                  'DEMO',
+                  style: TextStyle(
+                    fontSize: 10,
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: 1.2,
+                    color: Color(0xFFFD761A),
+                  ),
+                ),
+              ),
+            ],
+          ],
+        ),
         actions: [
           if (_autenticado)
             IconButton(
@@ -124,10 +158,22 @@ class _ProfileScreenState extends State<ProfileScreen> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(Icons.directions_bike, size: 64, color: Color(0xFF16A34A)),
-            const SizedBox(height: 16),
+            Container(
+              width: 80,
+              height: 80,
+              decoration: BoxDecoration(
+                gradient: const LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [Color(0xFF006B2C), Color(0xFF00873A)],
+                ),
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: const Icon(Icons.directions_bike, size: 44, color: Colors.white),
+            ),
+            const SizedBox(height: 20),
             Text(
-              'Inicia sesión para ver tu perfil',
+              'Tu ruta empieza aquí',
               style: theme.textTheme.headlineSmall?.copyWith(
                 fontWeight: FontWeight.w700,
                 color: isDark ? Colors.white : Colors.black87,
@@ -137,17 +183,61 @@ class _ProfileScreenState extends State<ProfileScreen> {
             const SizedBox(height: 8),
             Text(
               'Acumula puntos, sube de nivel y contribuye al mapa ciclista de Colombia.',
-              style: theme.textTheme.bodyMedium?.copyWith(color: theme.colorScheme.onSurface.withValues(alpha: 0.6)),
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+              ),
               textAlign: TextAlign.center,
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: 28),
+            // Botón Google
+            GradientButton(
+              label: 'Entrar con Google',
+              leading: Container(
+                padding: const EdgeInsets.all(4),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(4),
+                ),
+                child: const _GoogleLogo(),
+              ),
+              onPressed: _loginGoogle,
+            ),
+            const SizedBox(height: 12),
+            // Separador
+            Row(
+              children: [
+                Expanded(child: Divider(color: theme.colorScheme.outline.withValues(alpha: 0.4))),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                  child: Text(
+                    'o',
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: theme.colorScheme.onSurface.withValues(alpha: 0.4),
+                    ),
+                  ),
+                ),
+                Expanded(child: Divider(color: theme.colorScheme.outline.withValues(alpha: 0.4))),
+              ],
+            ),
+            const SizedBox(height: 12),
+            // Botón demo
             SizedBox(
               width: double.infinity,
-              child: ElevatedButton.icon(
-                onPressed: _loginGoogle,
-                icon: const Icon(Icons.login),
-                label: const Text('Entrar con Google'),
-                style: ElevatedButton.styleFrom(padding: const EdgeInsets.symmetric(vertical: 14)),
+              child: OutlinedButton.icon(
+                onPressed: _loginDemo,
+                icon: const Icon(Icons.science_outlined, size: 18),
+                label: const Text(
+                  'Probar sin cuenta',
+                  style: TextStyle(fontWeight: FontWeight.w600),
+                ),
+                style: OutlinedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  side: BorderSide(color: theme.colorScheme.outline),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
               ),
             ),
           ],
@@ -246,6 +336,24 @@ class _ProfileScreenState extends State<ProfileScreen> {
     } catch (_) {
       return '';
     }
+  }
+}
+
+/// Letra "G" estilizada para el botón de login con Google.
+class _GoogleLogo extends StatelessWidget {
+  const _GoogleLogo();
+
+  @override
+  Widget build(BuildContext context) {
+    return const Text(
+      'G',
+      style: TextStyle(
+        fontSize: 14,
+        fontWeight: FontWeight.w700,
+        color: Color(0xFF4285F4),
+        height: 1.0,
+      ),
+    );
   }
 }
 
